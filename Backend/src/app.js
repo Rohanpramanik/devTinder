@@ -4,18 +4,13 @@ const {userAuth, adminAuth} = require('./middleware/Authentication');
 const app = express();
 
 app.use("/getUserData", (req,res)=>{
-    //Logic of DB to get data
-
-    throw new Error('some error');
-    res.send("user data send");
-});
-
-app.use("/", (err, req, res, next)=>{
-    if(err){
-        // res.status(500).send("something went wrong 1");
-        console.log("erro 1")
-    }
-    next(err);
+    try{
+        //Logic of DB to get data
+        throw new Error('some error');
+        res.send("user data send");
+    }catch(err){
+        res.status(500).send("something went wrong in try");
+    } 
 });
 
 app.use((err, req, res, next)=>{
