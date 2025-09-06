@@ -3,23 +3,28 @@ const {userAuth, adminAuth} = require('./middleware/Authentication');
 
 const app = express();
 
-// app.use("/user", userAuth);
-app.use("/admin", adminAuth);
+app.use("/getUserData", (req,res)=>{
+    //Logic of DB to get data
 
-app.get("/user/login",(req,res)=>{
-    console.log("login ho gya")
-    res.send("its login");
+    throw new Error('some error');
+    res.send("user data send");
 });
 
-app.get("/user/profile", userAuth ,(req,res)=>{
-    console.log("handler 2")
-    res.send("its reacched");
+app.use("/", (err, req, res, next)=>{
+    if(err){
+        // res.status(500).send("something went wrong 1");
+        console.log("erro 1")
+    }
+    next(err);
 });
 
-app.get("/admin/getData",(req,res)=>{
-    console.log("admin getData")
-    res.send("admin data reacched");
+app.use((err, req, res, next)=>{
+    console.log("erro 2")
+    if(err){
+        res.status(500).send("something went wrong 2");
+    }
 });
+
 
 
 app.listen(5000, ()=>{
