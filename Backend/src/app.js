@@ -1,27 +1,34 @@
-const express = require('express');
-const {userAuth, adminAuth} = require('./middleware/Authentication');
+const express = require("express");
+const connectDB = require("./config/database");
+const User = require("./models/user");
 
 const app = express();
 
-app.use("/getUserData", (req,res)=>{
-    try{
-        //Logic of DB to get data
-        throw new Error('some error');
-        res.send("user data send");
-    }catch(err){
-        res.status(500).send("something went wrong in try");
-    } 
+app.post("/signup", async (req, res) => {
+  const userObj = {
+    firstName: "mansa",
+    lastName: "kumari",
+    emailId: "mansa@gmail.com",
+    password: "mansa123#",
+  };
+
+  try {
+    // throw new Error("kuch gya");
+    const user = new User(userObj);
+    await user.save();
+    res.send("Profile created successfully");
+  } catch (err) {
+    res.status(400).send("Error saving the user : " + err.message);
+  }
 });
 
-app.use((err, req, res, next)=>{
-    console.log("erro 2")
-    if(err){
-        res.status(500).send("something went wrong 2");
-    }
-});
-
-
-
-app.listen(5000, ()=>{
-    console.log("server started on port 5000");
-})
+connectDB()
+  .then(() => {
+    console.log("Database connection established");
+    app.listen(5000, () => {
+      console.log("server started on port 5000");
+    });
+  })
+  .catch((err) => {
+    console.log("Database connection failed");
+  });
