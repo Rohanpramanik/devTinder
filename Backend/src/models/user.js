@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
+const { default: isEmail } = require("validator/lib/isEmail");
+const { default: isURL } = require("validator/lib/isURL");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,11 +22,21 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
+      validate(value){
+        if(!validator.isEmail(value)){
+          throw new Error("Email Id is not valid");
+        }
+      }
     },
     password: {
       type: String,
       required: true,
-      minLength: 8
+      minLength: 8,
+      validate(value){
+        if(!validator.isStrongPassword(value)){
+          throw new Error("Password is not strong");
+        }
+      }
     },
     age: {
       type: Number,
@@ -44,6 +57,11 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
+      validate(value){
+        if(!validator.isURL(value)){
+          throw new Error("Photo Url is not correct");
+        }
+      },
       default:
         "https://images.unsplash.com/photo-1544005313-94ddf0286df2?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8cGVyc29ufGVufDB8fDB8fHww",
     },
