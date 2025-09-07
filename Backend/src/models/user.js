@@ -72,8 +72,6 @@ const userSchema = new mongoose.Schema(
         const eachskillsLength = value.every(skill => skill.length >= 10)
         if (skillsLength) {
           throw new Error("You can add upto 10 skills");
-        }else if(eachskillsLength){
-          throw new Error("Each skills limit is 10 character");
         }
       },
     },

@@ -14,6 +14,7 @@
   "author": "Rohan Pramanik",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
     "mongoose": "^8.18.0",
     "validator": "^13.15.15"

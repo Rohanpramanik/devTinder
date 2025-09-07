@@ -1,15 +1,29 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const validateSignup = require("./utils/validation");
+const bcrypt = require("bcryptjs");
 
 const app = express();
 app.use(express.json()); // middleware to convert json to js obj
 
 app.post("/signup", async (req, res) => {
-  const userData = req.body;
   try {
+    const { firstName, lastName, emailId, password } = req.body;
+
+    // Validate sign up
+    validateSignup(req);
+
+    // encrypt password
+    const safePassword = await bcrypt.hash(password, 10);
+
     // creating new instance of user model
-    const newUser = new User(userData);
+    const newUser = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: safePassword,
+    });
     await newUser.save();
     res.send("Profile created successfully");
   } catch (err) {
@@ -85,8 +99,8 @@ app.patch("/user/:id", async (req, res) => {
       if (!isAllowed) {
         throw new Error("Can't update these field");
       }
-      if(user?.skills.length > 10){
-        throw new Error("You cannot enter more than 10 skills")
+      if (user?.skills.length > 10) {
+        throw new Error("You cannot enter more than 10 skills");
       }
       await User.findByIdAndUpdate(id, user, { runValidators: true });
       res.send("User details updated successfully");
