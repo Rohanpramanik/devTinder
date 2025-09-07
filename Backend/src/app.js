@@ -50,33 +50,70 @@ app.get("/feed", async (req, res) => {
 
 // Delete user from database
 app.delete("/user", async (req, res) => {
-    const id = req.body.userId;
-    try{
-        if(id){
-            const user = await User.findByIdAndDelete(id);
-            res.send("User deleted successfully");
-        }else{
-            res.status(404).send("User not found");
-        }
-    }catch(err) {
-        res.status(500).send("Somthing went wrong");
+  const id = req.body.userId;
+  try {
+    if (id) {
+      const user = await User.findByIdAndDelete(id);
+      res.send("User deleted successfully");
+    } else {
+      res.status(404).send("User not found");
     }
+  } catch (err) {
+    res.status(500).send("Somthing went wrong");
+  }
 });
 
-// Update user details
-app.patch("/user", async (req, res) => {
-    const id = req.body.userId;
-    const user = req.body;
-    try{
-        if(id){
-            await User.findByIdAndUpdate(id, user);
-            res.send("User details updated successfully");
-        }else{
-            res.status(404).send("User not found");
-        }
-    }catch(err) {
-        res.status(500).send("Somthing went wrong");
+// Update user details with ID
+app.patch("/user/:id", async (req, res) => {
+  const id = req.params?.id;
+  const user = req.body;
+  const ALLOWED_UPDATE = [
+    "skills",
+    "lastName",
+    "password",
+    "age",
+    "gender",
+    "photoUrl",
+    "about",
+  ];
+  const isAllowed = Object.keys(user).every((key) =>
+    ALLOWED_UPDATE.includes(key)
+  );
+
+  try {
+    if (id) {
+      if (!isAllowed) {
+        throw new Error("Can't update these field");
+      }
+      if(user?.skills.length > 10){
+        throw new Error("You cannot enter more than 10 skills")
+      }
+      await User.findByIdAndUpdate(id, user, { runValidators: true });
+      res.send("User details updated successfully");
+    } else {
+      res.status(404).send("User not found");
     }
+  } catch (err) {
+    res.status(500).send("Somthing went wrong : " + err.message);
+  }
+});
+
+// Update user details with Email
+app.patch("/userEmail", async (req, res) => {
+  const id = req.body.emailId;
+  const user = req.body;
+  try {
+    if (id) {
+      await User.findOneAndUpdate({ emailId: id }, user, {
+        runValidators: true,
+      });
+      res.send("User details updated successfully");
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (err) {
+    res.status(500).send("UPDATE FAILED : " + err.message);
+  }
 });
 
 connectDB()
